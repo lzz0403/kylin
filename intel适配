@@ -1,0 +1,23 @@
+有关于intel芯片组和BCM4360网卡适配银河麒麟V10系统（适用于macbook）
+在intel芯片组上安装银河麒麟V10系统存在问题：
+
+一开始登录界面瞬间从有亮度到亮度最低，屏幕变黑，当登录进去时，进入设置勉强看到亮度为100%。据分析，是此系统默认调光为系统亮度而不是intel_backlight的显卡亮度，并没有很好的去适配显卡，解决方案参考此blog中的一部分https://www.likecs.com/show-191087.html
+（设置调节亮度默认为集显的方案）（设置亮度，用Fn是不能调节的。因为Fn调节的是/sys/class/backlight/acpi_video0/brightness文件，而I卡的文件是/sys/class/backlight/intel_backlight/brightness）（开启Intel集成显卡的自动调节功能）
+
+sudo gedit /etc/default/grub
+找到GRUB_CMDLINE_LINUX_DEFAULT="quiet splash",在quiet splash后（引号内）添加pcie_aspm=force i915.semaphores=1 acpi_osi=Linux acpi_backlight=vendor elevator=noop i915.i915_enable_rc6=1 i915.i915_enable_fbc=1 i915.lvds_downclock=1
+
+然后点保存并关闭编辑器执行：
+
+sudo update-grub
+以上为intel显卡适配的方案，下面是对BCM4360网卡的适配
+
+需要外接网线
+
+需要更新内核然后获取apt-get最新资源进行包搜索，具体操作如下：
+
+sudo apt-get update
+sudo apt-get --reinstall install bcmwl-kernel-source
+然后重启
+
+以上是对此电脑intel集显的适配和BCM网卡的适配，附件附含本机配置及驱动[![]
